@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+     http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd
+     http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+     http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+     http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+	
+	
+	
+
+   <context:annotation-config />
+	<context:component-scan base-package="com.how2java.service" />
+
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">  
+	  <property name="driverClassName">  
+	      <value>com.mysql.jdbc.Driver</value>  
+	  </property>  
+	  <property name="url">  
+	      <value>jdbc:mysql://localhost:3306/sxdtest?characterEncoding=UTF-8</value>  
+	
+	  </property>  
+	  <property name="username">  
+	      <value>root</value>  
+	  </property>  
+	  <property name="password">  
+	      <value>161210318sxd</value>  
+	  </property>  	
+	</bean>
+	
+	
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="typeAliasesPackage" value="com.how2java.pojo" />
+		<property name="dataSource" ref="dataSource"/>
+		<property name="mapperLocations" value="classpath:com/how2java/mapper/*.xml"/>
+	</bean>
+
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.how2java.mapper"/>
+	</bean>
+	
+	<!-- 下面这一行表示使用注释形式进行事务监控 ，如果使用aop方式则去注释这一行，并放开下面的注释，记得去除服务类实现里的注释-->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    
+    <!-- 引入事务管理，实现aop方式，如果不实现aop方式，需要在服务的实现类中注解需要控制事务的操作 -->
+	<!-- <tx:advice id="txadvice" transaction-manager="transactionManager">  
+        <tx:attributes>  
+            <tx:method name="add*" propagation="REQUIRED" rollback-for="Exception" />  
+            <tx:method name="del*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="edit*" propagation="REQUIRED" rollback-for="Exception" />
+            <tx:method name="update*" propagation="REQUIRED" rollback-for="Exception"/>  
+            <tx:method name="list*" propagation="REQUIRED" rollback-for="Exception"/>  
+        </tx:attributes>  
+    </tx:advice> 
+       
+    <aop:config>  
+        <aop:pointcut id="serviceMethod" expression="execution(* com.how2java.service.*.*(..))"/>  
+        <aop:advisor pointcut-ref="serviceMethod" advice-ref="txadvice"/>  
+    </aop:config>        -->
+
+</beans>
